@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+let {CreateRoleValidator,validationResult} = require('../utils/validatorHandler')
 
 let roleModel = require("../schemas/roles");
 
@@ -25,7 +26,7 @@ router.get("/:id", async function (req, res, next) {
 });
 
 
-router.post("/", async function (req, res, next) {
+router.post("/",CreateRoleValidator,validationResult, async function (req, res, next) {
     try {
         let newItem = new roleModel({
             name: req.body.name,
