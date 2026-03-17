@@ -3,6 +3,8 @@ var router = express.Router();
 let userController = require('../controllers/users')
 let { RegisterValidator, validationResult } = require('../utils/validatorHandler')
 let { CheckLogin } = require('../utils/authHandler')
+let jwt = require('jsonwebtoken')
+let fs = require('fs')
 
 router.post('/register', RegisterValidator, validationResult, async function (req, res, next) {
     try {
@@ -32,11 +34,17 @@ router.post('/login', async function (req, res, next) {
             res.status(403).send("sai thong tin dang nhap");
             return;
         }
-        res.cookie("LOGIN_NNPTUD_S3", result._id.toString().trimLeft().trimRight(), {
+        let token = jwt.sign({
+            id:result._id
+        },'secretKey',{
+            expiresIn:'1d',
+            algorithm:'RS256'
+        })
+        res.cookie("LOGIN_NNPTUD_S3", token, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true
         })
-        res.send(result._id)
+        res.send(token)
 
     } catch (err) {
         res.status(400).send({ message: err.message });
@@ -51,7 +59,7 @@ router.post('/logout', CheckLogin, function (req, res, next) {
         maxAge: 0,
         httpOnly: true
     })
-    res.send("da logout")
+    res.send("da logout ")
 })
 
 module.exports = router;
