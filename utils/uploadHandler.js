@@ -23,7 +23,16 @@ let filterImage = function (req, file, cb) {
     }
 }
 let filterExcel = function (req, file, cb) {
-    if (file.mimetype.includes('spreadsheetml')) {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    const isExcelExt = ext === '.xlsx' || ext === '.xls';
+    const excelMimeTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
+        'application/octet-stream'
+    ];
+    const isExcelMime = excelMimeTypes.includes(file.mimetype) || file.mimetype.includes('spreadsheetml');
+
+    if (isExcelExt && isExcelMime) {
         cb(null, true)
     } else {
         cb(new Error("dinh dang file khong dung "))
